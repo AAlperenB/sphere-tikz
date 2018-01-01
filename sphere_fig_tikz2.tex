@@ -52,12 +52,15 @@
   \draw[current plane,dashed] (180-\angVis:{(#1)*cos(#4)}) arc (180-\angVis:\angVis:{(#1)*cos(#4)});
 }
 \newcommand\DrawLatitudeCircle[4][1]{
-  \LatitudePlane{#1}{#2}{#3}{#4}
-  \pgfmathsetmacro\sinVis{sin(#4)/cos(#4)*sin(#2)/cos(#2)}
-  % angle of "visibility"
-  \pgfmathsetmacro\angVis{asin(min(1,max(\sinVis,-1)))}
-  \draw[current plane] (\angVis:{(#1)*cos(#4)}) arc (\angVis:-\angVis-180:{(#1)*cos(#4)});
-  \draw[current plane,dashed] (180-\angVis : {(#1)*cos(#4)}) arc (180-\angVis:\angVis:{(#1)*cos(#4)});
+	\LatitudePlane{#1}{#2}{0}{#4} % To make calulations easiear assume \angAz=0.
+    \begin{scope}[thin]
+	\clip[current plane] ({(#1)*tan(#2)*sin(#4)}, {-2*(#1)}) rectangle ({2*(#1)}, {2*(#1)});
+	\draw[current plane] (0,0) circle ({(#1)*cos(#4)});
+	\end{scope}
+	\begin{scope}[thin]
+	\draw[current plane] ({-2*(#1)},{-2*(#1)}) rectangle ({(#1)*tan(#2)*sin(#4)},{2*(#1)});
+	\draw[current plane, dashed] (0,0) circle ({(#1)*cos(#4)});
+	\end{scope}
 }
 \tikzset{xyplane/.style={cm={sin(\angAz), -cos(\angAz)*sin(\angEl), cos(\angAz), sin(\angAz)*sin(\angEl), (0,0)}}}
 \tikzset{yzplane/.style={cm={cos(\angAz), sin(\angAz)*sin(\angEl), 0, cos(\angAz), (0,0)}}}
@@ -69,9 +72,8 @@
 \begin{tikzpicture}[line cap=round, line join=round,>=triangle 45]
 \def\R{4} 				% Define radius
 \def\angEl{10}			% Define elevation angle
-\def\angAz{0}			% Define azimuth angle
-\draw (0,0) circle (\R);% Use [ball color=white] to shade.
-\DrawLatitudeCircle[\R]{\angEl}{\angAz}{0}
+\def\angAz{10}			% Define azimuth angle
+\draw (0,0) circle (\R);% Use [ball color=white] to shade.\DrawLatitudeCircle[\R]{\angEl}{\angAz}{0}
 \DrawLatitudeCircle[\R]{\angEl}{\angAz}{50}
 \DrawLongitudeCircle[\R]{\angEl}{\angAz}{30}
 \DrawYLatitudeCircle[\R]{\angEl}{\angAz}{50}
@@ -81,6 +83,7 @@
 \draw[xyplane, ->]		(0,0) -- node[below, at end] {$y$} (0,6);
 \draw[xzplane, ->] 		(0,0) -- node[left, at end] {$z$} (0,6); 
 \draw[xyplane]			(-1.5*\R,-1.5*\R) rectangle (1.5*\R,1.5*\R); 
+
 \end{tikzpicture}
 \caption{A Sphere}
 \end{figure}
