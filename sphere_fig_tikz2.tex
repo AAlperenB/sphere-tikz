@@ -36,7 +36,7 @@
 	\tikzset{#1/.style={cm={\cosAz,\sinAz*\sinEl,0,\cosEl,({(#2)*\sinAz*\sinLat},{-(#2)*\cosAz*\sinEl*\sinLat})}}}
 }
 \newcommand\DrawXLatitudeCircle[4][1]{
-  \XLatitudePlane{#1}{#2}{#3}{#4} 
+  \XLatitudePlane{#1}{#2}{#3}{#4}
   \pgfmathsetmacro\sinVis{sin(#4)/cos(#4)*sin(#2)/cos(#2)}
   % angle of "visibility"
   \pgfmathsetmacro\angVis{asin(min(1,max(\sinVis,-1)))}
@@ -44,7 +44,7 @@
   \draw[current plane,dashed] (180-\angVis:{(#1)*cos(#4)}) arc (180-\angVis:\angVis:{(#1)*cos(#4)});
 }
 \newcommand\DrawYLatitudeCircle[4][1]{
-  \YLatitudePlane{#1}{#2}{#3}{#4} 
+  \YLatitudePlane{#1}{#2}{#3}{#4}
   \pgfmathsetmacro\sinVis{sin(#4)/cos(#4)*sin(#2)/cos(#2)}
   % angle of "visibility"
   \pgfmathsetmacro\angVis{asin(min(1,max(\sinVis,-1)))}
@@ -79,15 +79,13 @@
 \DrawYLatitudeCircle[\R]{\angEl}{\angAz}{50}
 \DrawXLatitudeCircle[\R]{\angEl}{\angAz}{-70}
 %
-\draw[xyplane, ->] 		(0,0) -- node[below, at end] {$x$} (6,0); 
+\draw[xyplane, ->] 		(0,0) -- node[below, at end] {$x$} (6,0);
 \draw[xyplane, ->]		(0,0) -- node[below, at end] {$y$} (0,6);
-\draw[xzplane, ->] 		(0,0) -- node[left, at end] {$z$} (0,6); 
-\draw[xyplane]			(-1.5*\R,-1.5*\R) rectangle (1.5*\R,1.5*\R); 
+\draw[xzplane, ->] 		(0,0) -- node[left, at end] {$z$} (0,6);
+\draw[xyplane]			(-1.5*\R,-1.5*\R) rectangle (1.5*\R,1.5*\R);
 
 \end{tikzpicture}
 \caption{A Sphere}
 \end{figure}
-Some stuff about nice formulas. Önce insan. $\frac{a^2 \sqrt{3}}{4}$. 
-
-No time fo' hatin', I gots to be integrating.
+Some stuff about nice formulas. $\frac{a^2 \sqrt{3}}{4}$.
 \end{document}
