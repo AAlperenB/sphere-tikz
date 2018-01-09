@@ -18,7 +18,7 @@
 	\tikzset{ #1/.style = {cm= { sin(#4), {-cos(#4)*sin(#3)}, 0, cos(#3), ({(#2)*cos(#4)*sin(#5)}, {(#2)*sin(#4)*sin(#3)*sin(#5)}) } }}
 }
 
-\newcommand\defcommonplanes[2]{% {#1} Elecation, {#2} Azimuth
+\newcommand\defcommonplanes[2]{% {#1} Elevation, {#2} Azimuth
 \tikzset{xyplane/.style={cm = { sin(#2), {-cos(#2)*sin(#1)}, cos(#2), {sin(#2)*sin(#1)}, (0, 0) } }}
 \tikzset{yzplane/.style={cm = { cos(#2), { sin(#2)*sin(#1)}, 0, cos(#2), (0,0) } }}
 \tikzset{xzplane/.style={cm = { sin(#2), {-cos(#2)*sin(#1)}, 0, cos(#2), (0,0) } }}
