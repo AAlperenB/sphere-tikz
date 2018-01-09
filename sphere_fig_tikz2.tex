@@ -1,40 +1,37 @@
 \documentclass[12pt]{article}
-\usepackage{journal}
-\newcommand{\pgfmathsinandcos}[3]{ % Calculate sin and cos
-	\pgfmathsetmacro{#1}{sin(#3)}
-	\pgfmathsetmacro{#2}{cos(#3)}
+\usepackage{tikz}
+	\usetikzlibrary{arrows}
+
+\newcommand\LongitudePlane[4][current plane]{%{#2} Elevation,  {#3} Azimuth, {#4} Longitude.
+	\tikzset{ #1/.style = {cm = { { sin(#3)*cos(#4) + cos(#3)*sin(#4)}, {-cos(#3)*sin(#2)*cos(#4) + sin(#3)*sin(#2)*sin(#4)}, 0, cos(#2), (0,0)} }}
 }
-\newcommand\LongitudePlane[4][current plane]{%
-	\pgfmathsinandcos{\sinEl}{\cosEl}{#2} 	% Elevation
-	\pgfmathsinandcos{\sinAz}{\cosAz}{#3}	% Azimuth
-	\pgfmathsinandcos{\sinLon}{\cosLon}{#4}	% Longitude
-	\tikzset{#1/.style={cm={{\sinAz*\cosLon + \cosAz*\sinLon},{-\cosAz*\sinEl*\cosLon + \sinAz*\sinEl*\sinLon},0,{\cosEl},(0,0)}}}
+
+\newcommand\LatitudePlane[5][current plane]{%{#2} Radius, {#3} Elevation,  {#4} Azimuth, {#5} Latitude.
+	\tikzset{ #1/.style = {cm = { sin(#4), -cos(#4)*sin(#3), cos(#4), sin(#4)*sin(#3), (0, {(#2)*cos(#3)*sin(#5)}) } }}
 }
+
+\newcommand\XLatitudePlane[5][current plane]{%{#2} Radius, {#3} Elevation,  {#4} Azimuth, {#5} Latitude.
+	\tikzset{ #1/.style = {cm = { cos(#4), {sin(#4)*sin(#3)}, 0, cos(#3), ({(#2)*sin(#4)*sin(#5)}, {-(#2)*cos(#4)*sin(#3)*sin(#5)}) } }}
+}
+
+\newcommand\YLatitudePlane[5][current plane]{%{#2} Radius, {#3} Elevation,  {#4} Azimuth, {#5} Latitude.
+	\tikzset{ #1/.style = {cm= { sin(#4), {-cos(#4)*sin(#3)}, 0, cos(#3), ({(#2)*cos(#4)*sin(#5)}, {(#2)*sin(#4)*sin(#3)*sin(#5)}) } }}
+}
+
+\newcommand\defcommonplanes[2]{% {#1} Elecation, {#2} Azimuth
+\tikzset{xyplane/.style={cm = { sin(#2), {-cos(#2)*sin(#1)}, cos(#2), {sin(#2)*sin(#1)}, (0, 0) } }}
+\tikzset{yzplane/.style={cm = { cos(#2), { sin(#2)*sin(#1)}, 0, cos(#2), (0,0) } }}
+\tikzset{xzplane/.style={cm = { sin(#2), {-cos(#2)*sin(#1)}, 0, cos(#2), (0,0) } }}
+}
+
 \newcommand\DrawLongitudeCircle[4][1]{
   \LongitudePlane{#2}{#3}{#4}
    % angle of "visibility"
-  \pgfmathsetmacro\angVis{atan(sin(#4)*cos(#2)/sin(#2))} %
+  \pgfmathsetmacro\angVis{atan(sin(#4)*cos(#2)/sin(#2))}
   \draw[current plane] (\angVis: {#1}) arc (\angVis:\angVis+180: {#1});
   \draw[current plane,dashed] (\angVis-180: {#1}) arc (\angVis-180:\angVis: {#1});
 }
-\newcommand\LatitudePlane[5][current plane]{%
-	\pgfmathsinandcos{\sinEl}{\cosEl}{#3}	% Elevation
-	\pgfmathsinandcos{\sinAz}{\cosAz}{#4}	% Azimuth
-	\pgfmathsinandcos{\sinLat}{\cosLat}{#5} % Latitude
-	\tikzset{#1/.style={cm={\sinAz,-\cosAz*\sinEl,\cosAz,\sinAz*\sinEl,(0,{(#2)*\cosEl*\sinLat})}}} %
-}
-\newcommand\YLatitudePlane[5][current plane]{%
-	\pgfmathsinandcos{\sinEl}{\cosEl}{#3}	% Elevation
-	\pgfmathsinandcos{\sinAz}{\cosAz}{#4}	% Azimuth
-	\pgfmathsinandcos{\sinLat}{\cosLat}{#5} % Latitude
-	\tikzset{#1/.style={cm={\sinAz,-\cosAz*\sinEl,0,\cosEl,({(#2)*\cosAz*\sinLat},{(#2)*\sinAz*\sinEl*\sinLat})}}}
-}
-\newcommand\XLatitudePlane[5][current plane]{%
-	\pgfmathsinandcos{\sinEl}{\cosEl}{#3}	% Elevation
-	\pgfmathsinandcos{\sinAz}{\cosAz}{#4}	% Azimuth
-	\pgfmathsinandcos{\sinLat}{\cosLat}{#5} % Latitude
-	\tikzset{#1/.style={cm={\cosAz,\sinAz*\sinEl,0,\cosEl,({(#2)*\sinAz*\sinLat},{-(#2)*\cosAz*\sinEl*\sinLat})}}}
-}
+
 \newcommand\DrawXLatitudeCircle[4][1]{
   \XLatitudePlane{#1}{#2}{#3}{#4}
   \pgfmathsetmacro\sinVis{sin(#4)/cos(#4)*sin(#2)/cos(#2)}
@@ -43,6 +40,7 @@
   \draw[current plane] (\angVis:{(#1)*cos(#4)}) arc (\angVis:-\angVis-180:{(#1)*cos(#4)});
   \draw[current plane,dashed] (180-\angVis:{(#1)*cos(#4)}) arc (180-\angVis:\angVis:{(#1)*cos(#4)});
 }
+
 \newcommand\DrawYLatitudeCircle[4][1]{
   \YLatitudePlane{#1}{#2}{#3}{#4}
   \pgfmathsetmacro\sinVis{sin(#4)/cos(#4)*sin(#2)/cos(#2)}
@@ -62,18 +60,20 @@
 	\draw[current plane, dashed] (0,0) circle ({(#1)*cos(#4)});
 	\end{scope}
 }
-\tikzset{xyplane/.style={cm={sin(\angAz), -cos(\angAz)*sin(\angEl), cos(\angAz), sin(\angAz)*sin(\angEl), (0,0)}}}
-\tikzset{yzplane/.style={cm={cos(\angAz), sin(\angAz)*sin(\angEl), 0, cos(\angAz), (0,0)}}}
-\tikzset{xzplane/.style={cm={sin(\angAz), -cos(\angAz)*sin(\angEl), 0, cos(\angAz), (0,0)}}}
+%
+%
+% Begin Document
+%
 %
 \begin{document}
 \begin{figure}
 	\centering
 	\begin{tikzpicture}[line cap=round, line join=round,>=triangle 45]
-		\def\R{4} 				% Define radius
-		\def\angEl{10}			% Define elevation angle
-		\def\angAz{10}			% Define azimuth angle
-		\draw (0,0) circle (\R);% Use [ball color=white] to shade.\DrawLatitudeCircle[\R]{\angEl}{\angAz}{0}
+		\def\R{4} 									% Define radius
+		\def\angEl{10}								% Define elevation angle
+		\def\angAz{10}								% Define azimuth angle
+		\defcommonplanes{\angEl}{\angAz} 	% Define common planes
+		\draw (0,0) circle (\R);				% Use [ball color=white] to shade.\DrawLatitudeCircle[\R]{\angEl}{\angAz}{0}
 		\DrawLatitudeCircle[\R]{\angEl}{\angAz}{50}
 		\DrawLongitudeCircle[\R]{\angEl}{\angAz}{30}
 		\DrawYLatitudeCircle[\R]{\angEl}{\angAz}{50}
@@ -82,8 +82,7 @@
 		\draw[xyplane, ->] 		(0,0) -- node[below, at end] {$x$} (6,0);
 		\draw[xyplane, ->]		(0,0) -- node[below, at end] {$y$} (0,6);
 		\draw[xzplane, ->] 		(0,0) -- node[left, at end] {$z$} (0,6);
-		\draw[xyplane]			(-1.5*\R,-1.5*\R) rectangle (1.5*\R,1.5*\R);
-
+		\draw[xyplane, ->]		(-1.5*\R,-1.5*\R) rectangle (1.5*\R,1.5*\R);
 	\end{tikzpicture}
 	\caption{A Sphere}
 \end{figure}
