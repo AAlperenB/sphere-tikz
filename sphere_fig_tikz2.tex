@@ -68,24 +68,24 @@
 %
 \begin{document}
 \begin{figure}
-\centering
-\begin{tikzpicture}[line cap=round, line join=round,>=triangle 45]
-\def\R{4} 				% Define radius
-\def\angEl{10}			% Define elevation angle
-\def\angAz{10}			% Define azimuth angle
-\draw (0,0) circle (\R);% Use [ball color=white] to shade.\DrawLatitudeCircle[\R]{\angEl}{\angAz}{0}
-\DrawLatitudeCircle[\R]{\angEl}{\angAz}{50}
-\DrawLongitudeCircle[\R]{\angEl}{\angAz}{30}
-\DrawYLatitudeCircle[\R]{\angEl}{\angAz}{50}
-\DrawXLatitudeCircle[\R]{\angEl}{\angAz}{-70}
-%
-\draw[xyplane, ->] 		(0,0) -- node[below, at end] {$x$} (6,0);
-\draw[xyplane, ->]		(0,0) -- node[below, at end] {$y$} (0,6);
-\draw[xzplane, ->] 		(0,0) -- node[left, at end] {$z$} (0,6);
-\draw[xyplane]			(-1.5*\R,-1.5*\R) rectangle (1.5*\R,1.5*\R);
+	\centering
+	\begin{tikzpicture}[line cap=round, line join=round,>=triangle 45]
+		\def\R{4} 				% Define radius
+		\def\angEl{10}			% Define elevation angle
+		\def\angAz{10}			% Define azimuth angle
+		\draw (0,0) circle (\R);% Use [ball color=white] to shade.\DrawLatitudeCircle[\R]{\angEl}{\angAz}{0}
+		\DrawLatitudeCircle[\R]{\angEl}{\angAz}{50}
+		\DrawLongitudeCircle[\R]{\angEl}{\angAz}{30}
+		\DrawYLatitudeCircle[\R]{\angEl}{\angAz}{50}
+		\DrawXLatitudeCircle[\R]{\angEl}{\angAz}{-70}
+		%
+		\draw[xyplane, ->] 		(0,0) -- node[below, at end] {$x$} (6,0);
+		\draw[xyplane, ->]		(0,0) -- node[below, at end] {$y$} (0,6);
+		\draw[xzplane, ->] 		(0,0) -- node[left, at end] {$z$} (0,6);
+		\draw[xyplane]			(-1.5*\R,-1.5*\R) rectangle (1.5*\R,1.5*\R);
 
-\end{tikzpicture}
-\caption{A Sphere}
+	\end{tikzpicture}
+	\caption{A Sphere}
 \end{figure}
 Some stuff about nice formulas. $\frac{a^2 \sqrt{3}}{4}$.
 \end{document}
