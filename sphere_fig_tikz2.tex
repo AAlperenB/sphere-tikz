@@ -2,7 +2,7 @@
 \usepackage{tikz}
 	\usetikzlibrary{arrows}
 %
-%%%% Initialize empty commands so that we can renew them using angle arguments only once
+%%%% Initialize the commands empty to renew after setting angle arguments
 %
 \newcommand*{\LongitudePlane}{}
 \newcommand*{\LatitudePlane}{}
@@ -13,7 +13,7 @@
 \newcommand*{\DrawXLatitudeCircle}{}
 \newcommand*{\DrawYLatitudeCircle}{}
 %
-%%%% Renew all commands usign Azimuth Angle and Elevation Angle
+%%%% Renew all commands using Azimuth Angle and Elevation Angle
 %
 \newcommand*{\setAnglesAzEl}[2]{% #1: Azimuth, #2: Elevation
 %%%% Define the common planes
@@ -33,8 +33,6 @@
 		\tikzset{ ##1/.style = {cm = { cos(#1), {sin(#1)*sin(#2)}, 0, cos(#2), ({(##2)*sin(#1)*sin(##3)}, {-(##2)*cos(#1)*sin(#2)*sin(##3)}) } }}%
 	}%
 	\renewcommand{\YLatitudePlane}[3][current plane]{% ##1: current plane, ##2: Radius, ##3: YLatitudePlane
-		%\tikzset{ #1/.style = {cm= { sin(#4), {-cos(#4)*sin(#3)}, 0, cos(#3), ({(#2)*cos(#4)*sin(#5)}, {(#2)*sin(#4)*sin(#3)*sin(#5)}) } }}
-		%{#2} Radius, {#3} Elevation,  {#4} Azimuth, {#5} Latitude.
 		\tikzset{ ##1/.style = {cm= { sin(#1), {-cos(#1)*sin(#2)}, 0, cos(#2), ({(##2)*cos(#1)*sin(##3)}, {(##2)*sin(#1)*sin(#2)*sin(##3)}) } }}%
 	}%
 %%%%
@@ -91,16 +89,16 @@
 		\def\angAz{10}							% Define azimuth angle
 		\setAnglesAzEl{\angAz}{\angEl}	% Define common planes
 		\draw (0,0) circle (\R);			% Use [ball color=white] to shade.
-		\DrawLatitudeCircle[\R]{0}
 		\DrawLatitudeCircle[\R]{20}
 		\DrawLongitudeCircle[\R]{10}
-		\DrawXLatitudeCircle[\R]{-80}
+		\DrawXLatitudeCircle[\R]{80}
 		\DrawYLatitudeCircle[\R]{50}
 		%
 		\draw[xyplane, ->] 		(0,0) -- node[below, at end] {$x$} (6,0);
 		\draw[xyplane, ->]		(0,0) -- node[below, at end] {$y$} (0,6);
 		\draw[xzplane, ->] 		(0,0) -- node[left, at end] {$z$} (0,6);
 		\draw[xyplane, ->]		(-1.5*\R,-1.5*\R) rectangle (1.5*\R,1.5*\R);
+		\draw[xyplane, dashed]	(0,0) circle (\R);
 	\end{tikzpicture}
 	\caption{A Sphere}
 \end{figure}
