@@ -1,6 +1,6 @@
 \documentclass[12pt]{article}
 \usepackage{tikz}
-	\usetikzlibrary{arrows}
+	\usetikzlibrary{arrows, calc, math}
 %
 %%%% Initialize the commands empty to renew after setting angle arguments
 %
@@ -54,10 +54,46 @@
 %%%%
 	\renewcommand{\DrawLatitudeCircle}[2][1]{% ##1: Radius, ##2 Latitude
 		\LatitudePlane{##1}{##2}
-   	\begin{scope}[thin]
+		\tikzmath{
+			if {sin(#2) == 0} then {
+				{ \draw[current plane, dashed] (0,0) circle ({(##1)*cos(##2)}); };
+			} else {
+				{ \draw[current plane] (0,0) circle ({(##1)*cos(##2)}); };
+			};
+		}
+		% \pgfmathparse{sin(#2)}% Calculate sin(El)
+		% \ifdim  \pgfmathresult pt = -1 pt % If El = 90
+		% 	\ifdim ##2 pt > 0 pt % If Lat > 0
+		% 		\draw[current plane, dashed] (0,0) circle ({(##1)*cos(##2)});
+		% 	\else
+		% 		\draw[current plane] (0,0) circle ({(##1)*cos(##2)});
+		% 	\fi
+		% \else
+		% 	\ifdim \pgfmathresult pt = 1 pt % If El = -90
+		% 		\ifdim ##2 pt < 0pt % If Lat < 0
+		% 			\draw[current plane, dashed] (0,0) circle ({(##1)*cos(##2)});
+		% 		\else
+		% 			\draw[current plane] (0,0) circle ({(##1)*cos(##2)});
+		% 		\fi
+		% 	\else
+		% 		\pgfmathparse{-(tan(#2)*tan(##2))}
+		% 		\ifdim \pgfmathresult pt > 1 pt
+		% 			\draw[current plane, dashed] (0,0) circle ({(##1)*cos(##2)});
+		% 		\else
+		% 			\ifdim \pfgmathresult pt < -1 pt
+		% 				\draw[current plane] (0,0) circle ({(##1)*cos(##2)});
+		% 			\else
+		% 				\pgfmathsetmacro\angVis{ acos( -(tan(#2)*cos(##2) )) }%
+		% 				\draw[current plane] ({-(#1) - \angVis}:{(##1)*cos(##2)}) arc ({-(#1) - \angVis}:{-(#1) + \angVis}:{(##1)*cos(##2)});
+		% 				\draw[current plane, dashed] ({-(#1) + \angVis}:{(##1)*cos(##2)}) arc ({-(#1) + \angVis}:{360 - (#1) - \angVis}:{(##1)*cos(##2)});
+		% 			\fi
+		% 		\fi
+		% 	\fi
+		% \fi
+   	%\begin{scope}[thin]
 			%\clip[current plane] ({(#1)*tan(#2)*sin(#4)}, {-2*(#1)}) rectangle ({2*(#1)}, {2*(#1)});
-			\draw[current plane] (0,0) circle ({(##1)*cos(##2)});
-		\end{scope}
+			%\draw[current plane] (0,0) circle ({(##1)*cos(##2)});
+		%\end{scope}
 		%\begin{scope}[thin]
 			%\draw[current plane] ({-2*(#1)},{-2*(#1)}) rectangle ({(#1)*tan(#2)*sin(#4)},{2*(#1)});
 			%\draw[current plane, dashed] (0,0) circle ({(#1)*cos(#4)});
@@ -81,7 +117,7 @@
 	  \draw[current plane,dashed] (180-\angVis:{(##1)*cos(##2)}) arc (180-\angVis:\angVis:{(##1)*cos(##2)});
 	}%
 }%
-\tikzset{mark coordinate/.style={inner sep=0pt,outer sep=0pt,minimum size=3pt, fill=black, circle}}
+\tikzset{mark coordinate/.style={inner sep=0pt,outer sep=0pt,minimum size=3pt, fill=black, circle}}%
 %%%%
 %
 %
@@ -95,12 +131,12 @@
 	\begin{tikzpicture}[line cap=round, line join=round,>=triangle 45]
 		\def\R{3}								% Define radius
 		\def\angEl{10}							% Define elevation angle
-		\def\angAz{10}							% Define azimuth angle
+		\def\angAz{0}							% Define azimuth angle
 		\setAnglesAzEl{\angAz}{\angEl}	% Define common planes
 		\draw (0,0) circle (\R);			% Use [ball color=white] to shade.
-		%\DrawLatitudeCircle[\R]{20}
-		\foreach \i in {-80, -40, ..., 80}
-			\DrawLongitudeCircle[\R]{\i};
+		\DrawLatitudeCircle[\R]{80}
+		%\foreach \i in {-80, -40, ..., 80}
+			%\DrawLongitudeCircle[\R]{\i}
 		%\DrawXLatitudeCircle[\R]{80}
 		%\DrawYLatitudeCircle[\R]{50}
 		\draw[xyplane, ->] 		(0,0) -- node[below, at end] {$x$} (4,0);
@@ -108,9 +144,9 @@
 		\draw[yzplane, ->] 		(0,0) -- node[left, at end] {$z$} (0,4);
 		\draw[xyplane, ->]		(-1.5*\R,-1.5*\R) rectangle (1.5*\R,1.5*\R);
 		\draw[xyplane, dashed]	(0,0) circle (\R);
-		\coordinate[mark coordinate] (N) at ([xzplane](0,\R));
-		\coordinate[mark coordinate] (S) at ([xzplane](0,-\R));
-		\coordinate[mark coordinate] (O) at ([xzplane](0,0));
+		\coordinate[mark coordinate] (N) at [xzplane]  (0,\R);
+		\coordinate[mark coordinate] (S) at [xzplane] (0,-\R);
+		\coordinate[mark coordinate] (O) at [xzplane] (0,0);
 		\node[above left]	at (N) {$\mathbf{N}$};
 		\node[below left]	at (S) {$\mathbf{S}$};
 	\end{tikzpicture}
