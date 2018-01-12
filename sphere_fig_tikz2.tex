@@ -18,8 +18,8 @@
 \newcommand*{\setAnglesAzEl}[2]{% #1: Azimuth, #2: Elevation
 %%%% Define the common planes
 	\tikzset{xyplane/.style={cm = { sin(#1), {-cos(#1)*sin(#2)}, cos(#1), {sin(#1)*sin(#2)}, (0, 0) } }}
-	\tikzset{yzplane/.style={cm = { cos(#1), { sin(#1)*sin(#2)}, 0, cos(#1), (0,0) } }}
-	\tikzset{xzplane/.style={cm = { sin(#1), {-cos(#1)*sin(#2)}, 0, cos(#1), (0,0) } }}
+	\tikzset{yzplane/.style={cm = { cos(#1), { sin(#1)*sin(#2)}, 0, cos(#2), (0,0) } }}
+	\tikzset{xzplane/.style={cm = { sin(#1), {-cos(#1)*sin(#2)}, 0, cos(#2), (0,0) } }}
 %%%%
 	\renewcommand{\LongitudePlane}[2][current plane]{% ##1: current plane, ##2: Longitude
 		\tikzset{ ##1/.style = {cm = { { sin(#1)*cos(##2) + cos(#1)*sin(##2)}, {-cos(#1)*sin(#2)*cos(##2) + sin(#1)*sin(#2)*sin(##2)}, 0, cos(#2), (0,0)} }}%
@@ -38,11 +38,18 @@
 %%%%
 	\renewcommand{\DrawLongitudeCircle}[2][1]{% ##1: Radius, ##2: Longitude
 		\LongitudePlane{##2}
-		% angle of "visibility"
-		% \pgfmathsetmacro\angVis{atan(sin(#4)*cos(#2)/sin(#2))}
-		\def\angVis{10} %TEST LINE, CALCULATE LATER
-		\draw[current plane] (\angVis: {##1}) arc (\angVis:\angVis+180: {##1});
-		\draw[current plane,dashed] (\angVis-180: {##1}) arc (\angVis-180:\angVis: {##1});
+		% Angle of "visibility" % tan(\angVis) = cot(El)*[sin(Az)sin(Lon) - cos(Az)cos(Lon)]
+		\ifnum #2 = 0 % If El=0
+			\def\angVis{-90}%
+		\else
+			\ifnum #2 = 180 %If El=180
+				\def\angVis{90}%
+			\else
+				\pgfmathsetmacro\angVis{ atan( cot(#2)*((sin(#1)*sin(##2)) - (cos(#1)*cos(##2))) ) }%
+			\fi
+		\fi
+		\draw[current plane] (\angVis:{##1}) arc (\angVis:\angVis+180:{##1});
+		\draw[current plane, dashed] (\angVis-180:{##1}) arc (\angVis-180:\angVis:{##1});
 	}%
 %%%%
 	\renewcommand{\DrawLatitudeCircle}[2][1]{% ##1: Radius, ##2 Latitude
@@ -66,13 +73,15 @@
 	}%
 	\renewcommand{\DrawYLatitudeCircle}[2][1]{% ##1: Radius, ##2: YLatitude
 	  \YLatitudePlane{##1}{##2}
-	  \pgfmathsetmacro\sinVis{sin(##2)/cos(##2)*sin(#2)/cos(#2)}
+	  %\pgfmathsetmacro\sinVis{sin(##2)/cos(##2)*sin(#2)/cos(#2)}
 	  % angle of "visibility"
-	  \pgfmathsetmacro\angVis{asin(min(1,max(\sinVis,-1)))}
+	  %\pgfmathsetmacro\angVis{asin(min(1,max(\sinVis,-1)))}
+	  \def\angVis{10} %TEST LINE, CALCULATE LATER
 	  \draw[current plane] (\angVis:{(##1)*cos(##2)}) arc (\angVis:-\angVis-180:{(##1)*cos(##2)});
 	  \draw[current plane,dashed] (180-\angVis:{(##1)*cos(##2)}) arc (180-\angVis:\angVis:{(##1)*cos(##2)});
 	}%
 }%
+\tikzset{mark coordinate/.style={inner sep=0pt,outer sep=0pt,minimum size=3pt, fill=black, circle}}
 %%%%
 %
 %
@@ -84,21 +93,26 @@
 \begin{figure}
 	\centering
 	\begin{tikzpicture}[line cap=round, line join=round,>=triangle 45]
-		\def\R{4}								% Define radius
+		\def\R{3}								% Define radius
 		\def\angEl{10}							% Define elevation angle
 		\def\angAz{10}							% Define azimuth angle
 		\setAnglesAzEl{\angAz}{\angEl}	% Define common planes
 		\draw (0,0) circle (\R);			% Use [ball color=white] to shade.
-		\DrawLatitudeCircle[\R]{20}
-		\DrawLongitudeCircle[\R]{10}
-		\DrawXLatitudeCircle[\R]{80}
-		\DrawYLatitudeCircle[\R]{50}
-		%
-		\draw[xyplane, ->] 		(0,0) -- node[below, at end] {$x$} (6,0);
-		\draw[xyplane, ->]		(0,0) -- node[below, at end] {$y$} (0,6);
-		\draw[xzplane, ->] 		(0,0) -- node[left, at end] {$z$} (0,6);
+		%\DrawLatitudeCircle[\R]{20}
+		\foreach \i in {-80, -40, ..., 80}
+			\DrawLongitudeCircle[\R]{\i};
+		%\DrawXLatitudeCircle[\R]{80}
+		%\DrawYLatitudeCircle[\R]{50}
+		\draw[xyplane, ->] 		(0,0) -- node[below, at end] {$x$} (4,0);
+		\draw[xyplane, ->]		(0,0) -- node[below, at end] {$y$} (0,4);
+		\draw[yzplane, ->] 		(0,0) -- node[left, at end] {$z$} (0,4);
 		\draw[xyplane, ->]		(-1.5*\R,-1.5*\R) rectangle (1.5*\R,1.5*\R);
 		\draw[xyplane, dashed]	(0,0) circle (\R);
+		\coordinate[mark coordinate] (N) at ([xzplane](0,\R));
+		\coordinate[mark coordinate] (S) at ([xzplane](0,-\R));
+		\coordinate[mark coordinate] (O) at ([xzplane](0,0));
+		\node[above left]	at (N) {$\mathbf{N}$};
+		\node[below left]	at (S) {$\mathbf{S}$};
 	\end{tikzpicture}
 	\caption{A Sphere}
 \end{figure}
