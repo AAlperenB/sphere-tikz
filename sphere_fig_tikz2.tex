@@ -39,15 +39,17 @@
 	\renewcommand{\DrawLongitudeCircle}[2][1]{% ##1: Radius, ##2: Longitude
 		\LongitudePlane{##2}
 		% Angle of "visibility" % tan(\angVis) = cot(El)*[sin(Az)sin(Lon) - cos(Az)cos(Lon)]
-		\ifnum #2 = 0 % If El=0
-			\def\angVis{-90}%
-		\else
-			\ifnum #2 = 180 %If El=180
-				\def\angVis{90}%
-			\else
-				\pgfmathsetmacro\angVis{ atan( cot(#2)*((sin(#1)*sin(##2)) - (cos(#1)*cos(##2))) ) }%
-			\fi
-		\fi
+		\tikzmath{%
+			if {cos(#2) == 1} then {% If El=0
+				\angVis = -90;
+			} else {%
+				if {cos(#2) == -1} then {% If El=180
+					\angVis = 90;
+				} else {
+					\angVis = atan( cot(#2)*((sin(#1)*sin(##2)) - (cos(#1)*cos(##2))) ) ;
+				};
+			};
+		}%
 		\draw[current plane] (\angVis:{##1}) arc (\angVis:\angVis+180:{##1});
 		\draw[current plane, dashed] (\angVis-180:{##1}) arc (\angVis-180:\angVis:{##1});
 	}%
