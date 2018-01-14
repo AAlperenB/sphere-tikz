@@ -41,17 +41,20 @@
 		% Angle of "visibility" % tan(\angVis) = cot(El)*[sin(Az)sin(Lon) - cos(Az)cos(Lon)]
 		\tikzmath{%
 			if {cos(#2) == 1} then {% If El=0
-				\angVis = -90;
+				\angVisA = -90;
+				\angVisB =  90;
 			} else {%
 				if {cos(#2) == -1} then {% If El=180
-					\angVis = 90;
+					\angVisA = 90;
+					\angVisB = 270;
 				} else {
-					\angVis = atan( cot(#2)*((sin(#1)*sin(##2)) - (cos(#1)*cos(##2))) ) ;
+					\angVisA = atan( cot(#2)*((sin(#1)*sin(##2)) - (cos(#1)*cos(##2))) ) ;
+					\angVisB = \angVisA + 180;
 				};
 			};
 		}%
-		\draw[current plane] (\angVis:{##1}) arc (\angVis:\angVis+180:{##1});
-		\draw[current plane, dashed] (\angVis-180:{##1}) arc (\angVis-180:\angVis:{##1});
+		\draw[current plane] (\angVisA: {##1}) arc (\angVisA: \angVisB: {##1});
+		\draw[current plane, dashed] (\angVisB:{##1}) arc (\angVisB: {360+\angVisA}: {##1});
 	}%
 %%%%
 	\renewcommand{\DrawLatitudeCircle}[2][1]{% ##1: Radius, ##2 Latitude
@@ -79,11 +82,13 @@
 						} else {%
 							if {-(tan(#2)*tan(##2)) > 1} then {%
 								{ \draw[current plane, dashed] (0,0) circle ({(##1)*cos(##2)}); };
-							} else {%
+							} else {% Angles of visibility
+								\angVisA = -(#1) - acos( -(tan(#2)*tan(##2);
+								\angVisB = -(#1) + acos( -(tan(#2)*tan(##2);
 								{%
 								\pgfmathsetmacro\angVis{ acos( -(tan(#2)*tan(##2) )) }%
-								\draw[current plane] ({-(#1) - \angVis}: {(##1)*cos(##2)}) arc ({-(#1) - \angVis}: {-(#1) + \angVis}: {(##1)*cos(##2)});
-								\draw[current plane, dashed] ({-(#1) + \angVis}: {(##1)*cos(##2)}) arc ({-(#1) + \angVis}: {360 - (#1) - \angVis}: {(##1)*cos(##2)});
+								\draw[current plane] (\angVisA: {(##1)*cos(##2)}) arc (\angVisA: \angVisB: {(##1)*cos(##2)});
+								\draw[current plane, dashed] (\angVisB: {(##1)*cos(##2)}) arc (\angVisB: {360 + \angVisA}: {(##1)*cos(##2)});
 								};
 							};
 						};
@@ -104,7 +109,7 @@
 				} else {%
 					if { (cos(#1)*tan(##2))/sqrt((sin(#1))^2 + (tan(#2))^2) > 1 } then {%
 						{ \draw[current plane] (0,0) circle ({(##1)*cos(##2)}); };
-					} else {%
+					} else {% Angles of visibility
 						\angVisA = - acos( sin(#1) / sqrt( (sin(#1))^2 + (tan(#2))^2) )%
 										- acos( (cos(#1)*tan(##2)) /sqrt((sin(#1))^2 + (tan(#2))^2) );
 						\angVisB = - acos( sin(#1) / sqrt( (sin(#1))^2 + (tan(#2))^2) )%
@@ -117,10 +122,6 @@
 				};
 			};
 		}
-%		\pgfmathsetmacro\angVis{atan(sin(#4)*cos(#2)/sin(#2))}
-%		\def\angVis{10} %TEST LINE, CALCULATE LATER
-%		\draw[current plane] (\angVis:{(##1)*cos(##2)}) arc (\angVis:-\angVis-180:{(##1)*cos(##2)});
-%		\draw[current plane,dashed] (180-\angVis:{(##1)*cos(##2)}) arc (180-\angVis:\angVis:{(##1)*cos(##2)});
 	}%
 	\renewcommand{\DrawYLatitudeCircle}[2][1]{% ##1: Radius, ##2: YLatitude
 	  \YLatitudePlane{##1}{##2}
@@ -146,13 +147,13 @@
 	\begin{tikzpicture}[line cap=round, line join=round,>=triangle 45]
 		\def\R{3.5}								% Define radius
 		\def\angEl{10}							% Define elevation angle
-		\def\angAz{-80}							% Define azimuth angle
+		\def\angAz{10}							% Define azimuth angle
 		\setAnglesAzEl{\angAz}{\angEl}	% Define common planes
 		\draw (0,0) circle (\R);			% Use [ball color=white] to shade.
 		\foreach \i in {-80, -60, ..., 80}
-%			\DrawLongitudeCircle[\R]{\i}
+			\DrawLongitudeCircle[\R]{\i};
 %			\DrawLatitudeCircle[\R]{\i}
-			\DrawXLatitudeCircle[\R]{\i};
+%			\DrawXLatitudeCircle[\R]{\i};
 		%\DrawYLatitudeCircle[\R]{50}
 		\draw[xyplane, ->] 	(0,0) -- node[below, at end] {$x$} (1.5*\R,0);
 		\draw[xyplane, ->]	(0,0) -- node[below, at end] {$y$} (0,1.5*\R);
