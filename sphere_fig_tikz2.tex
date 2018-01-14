@@ -104,33 +104,79 @@
 			if {cos(#2) == 0} then {% El = -90, 90
 				{ \draw[current plane] (0,0) circle ({(##1)*cos(##2)}); };
 			} else {%
-				if { (cos(#1)*tan(##2))/sqrt((sin(#1))^2 + (tan(#2))^2) < -1 } then {%
-					{ \draw[current plane, dashed] (0,0) circle ({(##1)*cos(##2)}); };
-				} else {%
-					if { (cos(#1)*tan(##2))/sqrt((sin(#1))^2 + (tan(#2))^2) > 1 } then {%
+				if { sin(#1) == 0 && sin(#2) == 0 } then {% Az = 0, El = 0
+					if {(##2)*cos(#1) < 0} then {% {Lat < 0 and Az = 0} or {Lat > 0 and Az = 180}
+						{ \draw[current plane, dashed] (0,0) circle ({(##1)*cos(##2)}); };
+					} else {% {Lat >= 0 and Az = 0} or {Lat <= 0 and Az=180}
 						{ \draw[current plane] (0,0) circle ({(##1)*cos(##2)}); };
-					} else {% Angles of visibility
-						\angVisA = - acos( sin(#1) / sqrt( (sin(#1))^2 + (tan(#2))^2) )%
-										- acos( (cos(#1)*tan(##2)) /sqrt((sin(#1))^2 + (tan(#2))^2) );
-						\angVisB = - acos( sin(#1) / sqrt( (sin(#1))^2 + (tan(#2))^2) )%
-										+ acos( (cos(#1)*tan(##2)) /sqrt((sin(#1))^2 + (tan(#2))^2) );
-						{%
-						\draw[current plane, dashed] (\angVisA: {(##1)*cos(##2)}) arc (\angVisA: \angVisB: {(##1)*cos(##2)});
-						\draw[current plane] (\angVisB: {(##1)*cos(##2)}) arc (\angVisB: {360+\angVisA}: {(##1)*cos(##2)});
+					};
+				} else {%
+					if { (cos(#1)*tan(##2))/sqrt((sin(#1))^2 + (tan(#2))^2) < -1 } then {%
+						{ \draw[current plane, dashed] (0,0) circle ({(##1)*cos(##2)}); };
+					} else {%
+						if { (cos(#1)*tan(##2))/sqrt((sin(#1))^2 + (tan(#2))^2) > 1 } then {%
+							{ \draw[current plane] (0,0) circle ({(##1)*cos(##2)}); };
+						} else {% Angles of visibility
+							if {tan(#2)>=0} then {%
+								\angVisA = - acos( sin(#1) / sqrt( (sin(#1))^2 + (tan(#2))^2) )%
+												- acos( (cos(#1)*tan(##2)) /sqrt((sin(#1))^2 + (tan(#2))^2) );
+								\angVisB = - acos( sin(#1) / sqrt( (sin(#1))^2 + (tan(#2))^2) )%
+												+ acos( (cos(#1)*tan(##2)) /sqrt((sin(#1))^2 + (tan(#2))^2) );
+							} else {%
+								\angVisA = acos( sin(#1) / sqrt( (sin(#1))^2 + (tan(#2))^2) )%
+												- acos( (cos(#1)*tan(##2)) /sqrt((sin(#1))^2 + (tan(#2))^2) );
+								\angVisB = acos( sin(#1) / sqrt( (sin(#1))^2 + (tan(#2))^2) )%
+												+ acos( (cos(#1)*tan(##2)) /sqrt((sin(#1))^2 + (tan(#2))^2) );
+							};
+							{%
+							\draw[current plane, dashed] (\angVisA: {(##1)*cos(##2)}) arc (\angVisA: \angVisB: {(##1)*cos(##2)});
+							\draw[current plane] (\angVisB: {(##1)*cos(##2)}) arc (\angVisB: {360+\angVisA}: {(##1)*cos(##2)});
+							};
 						};
 					};
 				};
 			};
-		}
+		}%
 	}%
 	\renewcommand{\DrawYLatitudeCircle}[2][1]{% ##1: Radius, ##2: YLatitude
-	  \YLatitudePlane{##1}{##2}
-	  %\pgfmathsetmacro\sinVis{sin(##2)/cos(##2)*sin(#2)/cos(#2)}
-	  % angle of "visibility"
-	  %\pgfmathsetmacro\angVis{asin(min(1,max(\sinVis,-1)))}
-	  \def\angVis{10} %TEST LINE, CALCULATE LATER
-	  \draw[current plane] (\angVis:{(##1)*cos(##2)}) arc (\angVis:-\angVis-180:{(##1)*cos(##2)});
-	  \draw[current plane,dashed] (180-\angVis:{(##1)*cos(##2)}) arc (180-\angVis:\angVis:{(##1)*cos(##2)});
+		\YLatitudePlane{##1}{##2}
+		\tikzmath{%
+			if {cos(#2) == 0} then {% El = -90, 90
+				{ \draw[current plane] (0,0) circle ({(##1)*cos(##2)}); };
+			} else {%
+				if { cos(#1) == 0 && sin(#2) == 0 } then {% Az = -90, +90, El = 0
+					if {(##2)*sin(#1) > 0} then {% {Lat > 0 and Az = 90} or {Lat < 0 and Az = -90}
+						{ \draw[current plane, dashed] (0,0) circle ({(##1)*cos(##2)}); };
+					} else {% {Lat <= 0 and Az = 90} or {Lat >= 0 and Az=-90}
+						{ \draw[current plane] (0,0) circle ({(##1)*cos(##2)}); };
+					};
+				} else {%
+					if { (sin(#1)*tan(##2))/sqrt((cos(#1))^2 + (tan(#2))^2) < -1 } then {%
+						{ \draw[current plane] (0,0) circle ({(##1)*cos(##2)}); };
+					} else {%
+						if { (sin(#1)*tan(##2))/sqrt((cos(#1))^2 + (tan(#2))^2) > 1 } then {%
+							{ \draw[current plane, dashed] (0,0) circle ({(##1)*cos(##2)}); };
+						} else {% Angles of visibility
+							if {tan(#2) >= 0} then {%
+								\angVisA = acos( cos(#1) / sqrt( (cos(#1))^2 + (tan(#2))^2) )%
+												- acos( (sin(#1)*tan(##2)) /sqrt((cos(#1))^2 + (tan(#2))^2) );
+								\angVisB = acos( cos(#1) / sqrt( (cos(#1))^2 + (tan(#2))^2) )%
+												+ acos( (sin(#1)*tan(##2)) /sqrt((cos(#1))^2 + (tan(#2))^2) );
+							} else {
+								\angVisA = - acos( cos(#1) / sqrt( (cos(#1))^2 + (tan(#2))^2) )%
+												- acos( (sin(#1)*tan(##2)) /sqrt((cos(#1))^2 + (tan(#2))^2) );
+								\angVisB = - acos( cos(#1) / sqrt( (cos(#1))^2 + (tan(#2))^2) )%
+												+ acos( (sin(#1)*tan(##2)) /sqrt((cos(#1))^2 + (tan(#2))^2) );
+							};
+							{%
+							\draw[current plane] (\angVisA: {(##1)*cos(##2)}) arc (\angVisA: \angVisB: {(##1)*cos(##2)});
+							\draw[current plane, dashed] (\angVisB: {(##1)*cos(##2)}) arc (\angVisB: {360+\angVisA}: {(##1)*cos(##2)});
+							};
+						};
+					};
+				};
+			};
+		}%
 	}%
 }%
 \tikzset{mark coordinate/.style={inner sep=0pt,outer sep=0pt,minimum size=3pt, fill=black, circle}}%
@@ -151,14 +197,14 @@
 		\setAnglesAzEl{\angAz}{\angEl}	% Define common planes
 		\draw (0,0) circle (\R);			% Use [ball color=white] to shade.
 		\foreach \i in {-80, -60, ..., 80}
-			\DrawLongitudeCircle[\R]{\i};
-%			\DrawLatitudeCircle[\R]{\i}
-%			\DrawXLatitudeCircle[\R]{\i};
-		%\DrawYLatitudeCircle[\R]{50}
-		\draw[xyplane, ->] 	(0,0) -- node[below, at end] {$x$} (1.5*\R,0);
-		\draw[xyplane, ->]	(0,0) -- node[below, at end] {$y$} (0,1.5*\R);
-		\draw[yzplane, ->] 	(0,0) -- node[left, at end] {$z$} (0,1.5*\R);
-		\draw[xyplane, ->]	(-1.5*\R,-1.5*\R) rectangle (1.5*\R,1.5*\R);
+			\DrawLongitudeCircle[\R]{\i}
+			\DrawLatitudeCircle[\R]{\i}
+			\DrawXLatitudeCircle[\R]{\i}
+			\DrawYLatitudeCircle[\R]{\i};
+		\draw[xyplane, ->] 	(-1.5*\R,0) -- node[below, at end] {$x$} (1.5*\R,0);
+		\draw[xyplane, ->]	(0,-1.5*\R) -- node[below, at end] {$y$} (0,1.5*\R);
+		\draw[yzplane, ->] 	(0,-1.5*\R) -- node[left, at end] {$z$} (0,1.5*\R);
+		%\draw[xyplane, ->]	(-1.5*\R,-1.5*\R) rectangle (1.5*\R,1.5*\R);
 		\begin{scope}[xzplane]
 			\coordinate[mark coordinate] (N) at (0,\R);
 			\coordinate[mark coordinate] (S) at (0,-\R);
