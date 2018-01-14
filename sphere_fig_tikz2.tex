@@ -95,10 +95,32 @@
 %%%%
 	\renewcommand{\DrawXLatitudeCircle}[2][1]{% ##1: Radius, ##2: XLatitude
 		\XLatitudePlane{##1}{##2}
-		% \pgfmathsetmacro\angVis{atan(sin(#4)*cos(#2)/sin(#2))}
-		\def\angVis{10} %TEST LINE, CALCULATE LATER
-		\draw[current plane] (\angVis:{(##1)*cos(##2)}) arc (\angVis:-\angVis-180:{(##1)*cos(##2)});
-		\draw[current plane,dashed] (180-\angVis:{(##1)*cos(##2)}) arc (180-\angVis:\angVis:{(##1)*cos(##2)});
+		\tikzmath{%
+			if {cos(#2) == 0} then {% El = -90, 90
+				{ \draw[current plane] (0,0) circle ({(##1)*cos(##2)}); };
+			} else {%
+				if { (cos(#1)*tan(##2))/sqrt((sin(#1))^2 + (tan(#2))^2) < -1 } then {%
+					{ \draw[current plane, dashed] (0,0) circle ({(##1)*cos(##2)}); };
+				} else {%
+					if { (cos(#1)*tan(##2))/sqrt((sin(#1))^2 + (tan(#2))^2) > 1 } then {%
+						{ \draw[current plane] (0,0) circle ({(##1)*cos(##2)}); };
+					} else {%
+						\angVisA = - acos( sin(#1) / sqrt( (sin(#1))^2 + (tan(#2))^2) )%
+										- acos( (cos(#1)*tan(##2)) /sqrt((sin(#1))^2 + (tan(#2))^2) );
+						\angVisB = - acos( sin(#1) / sqrt( (sin(#1))^2 + (tan(#2))^2) )%
+										+ acos( (cos(#1)*tan(##2)) /sqrt((sin(#1))^2 + (tan(#2))^2) );
+						{%
+						\draw[current plane, dashed] (\angVisA: {(##1)*cos(##2)}) arc (\angVisA: \angVisB: {(##1)*cos(##2)});
+						\draw[current plane] (\angVisB: {(##1)*cos(##2)}) arc (\angVisB: {360+\angVisA}: {(##1)*cos(##2)});
+						};
+					};
+				};
+			};
+		}
+%		\pgfmathsetmacro\angVis{atan(sin(#4)*cos(#2)/sin(#2))}
+%		\def\angVis{10} %TEST LINE, CALCULATE LATER
+%		\draw[current plane] (\angVis:{(##1)*cos(##2)}) arc (\angVis:-\angVis-180:{(##1)*cos(##2)});
+%		\draw[current plane,dashed] (180-\angVis:{(##1)*cos(##2)}) arc (180-\angVis:\angVis:{(##1)*cos(##2)});
 	}%
 	\renewcommand{\DrawYLatitudeCircle}[2][1]{% ##1: Radius, ##2: YLatitude
 	  \YLatitudePlane{##1}{##2}
@@ -124,13 +146,13 @@
 	\begin{tikzpicture}[line cap=round, line join=round,>=triangle 45]
 		\def\R{3.5}								% Define radius
 		\def\angEl{10}							% Define elevation angle
-		\def\angAz{10}							% Define azimuth angle
+		\def\angAz{-80}							% Define azimuth angle
 		\setAnglesAzEl{\angAz}{\angEl}	% Define common planes
 		\draw (0,0) circle (\R);			% Use [ball color=white] to shade.
 		\foreach \i in {-80, -60, ..., 80}
-			\DrawLongitudeCircle[\R]{\i}
-			\DrawLatitudeCircle[\R]{\i};
-		%\DrawXLatitudeCircle[\R]{80}
+%			\DrawLongitudeCircle[\R]{\i}
+%			\DrawLatitudeCircle[\R]{\i}
+			\DrawXLatitudeCircle[\R]{\i};
 		%\DrawYLatitudeCircle[\R]{50}
 		\draw[xyplane, ->] 	(0,0) -- node[below, at end] {$x$} (1.5*\R,0);
 		\draw[xyplane, ->]	(0,0) -- node[below, at end] {$y$} (0,1.5*\R);
