@@ -86,6 +86,7 @@
 								\angVisA = -(#1) - acos( -(tan(#2)*tan(##2);
 								\angVisB = -(#1) + acos( -(tan(#2)*tan(##2);
 								{%
+								\pgfmathsetmacro\angVis{ acos( -(tan(#2)*tan(##2) )) }%
 								\draw[current plane] (\angVisA: {(##1)*cos(##2)}) arc (\angVisA: \angVisB: {(##1)*cos(##2)});
 								\draw[current plane, dashed] (\angVisB: {(##1)*cos(##2)}) arc (\angVisB: {360 + \angVisA}: {(##1)*cos(##2)});
 								};
