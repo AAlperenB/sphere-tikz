@@ -47,7 +47,7 @@
 				if {cos(#2) == -1} then {% If El=180
 					\angVisA = 90;
 					\angVisB = 270;
-				} else {
+				} else {%
 					\angVisA = atan( cot(#2)*((sin(#1)*sin(##2)) - (cos(#1)*cos(##2))) ) ;
 					\angVisB = \angVisA + 180;
 				};
@@ -192,7 +192,7 @@
 	\begin{tikzpicture}[line cap=round, line join=round,>=triangle 45]
 		\def\R{3.5}								% Define radius
 		\def\angEl{10}							% Define elevation angle
-		\def\angAz{10}							% Define azimuth angle
+		\def\angAz{30}							% Define azimuth angle
 		\setAnglesAzEl{\angAz}{\angEl}	% Define common planes
 		\draw (0,0) circle (\R);			% Use [ball color=white] to shade.
 		\foreach \i in {-80, -60, ..., 80}
